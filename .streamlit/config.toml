@@ -1,0 +1,17 @@
+# Streamlit settings for the GST Reconciliation app.
+# Picked up automatically when `streamlit run app.py` is started from this folder.
+# Keep this file plain UTF-8 WITHOUT a byte-order mark, or Streamlit ignores it.
+
+[server]
+# Listen on the loopback interface only: the app (and the GST data in it) cannot be
+# opened from other computers on the network. Do not change to 0.0.0.0.
+address = "127.0.0.1"
+# Own port, so it never clashes with other Streamlit apps (they default to 8501).
+port = 8510
+# Uploaded registers / JSON files up to 200 MB
+maxUploadSize = 200
+
+[browser]
+serverAddress = "localhost"
+# Do not send usage statistics to Streamlit
+gatherUsageStats = false

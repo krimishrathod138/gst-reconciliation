@@ -1,0 +1,29 @@
+# --- Never commit: local database (user accounts, password hashes, reconciliation data) ---
+data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# --- Virtual environment / Python caches ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Local secrets / settings ---
+.env
+*.env
+.streamlit/secrets.toml
+
+# --- Generated reports and editor / OS files ---
+*.log
+~$*.xlsx
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
