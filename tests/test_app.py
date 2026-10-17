@@ -100,6 +100,32 @@ def test_first_run_creates_admin_then_login_required(db_url):
     assert fresh.sidebar.radio(key="nav").value == "Reconcile"
 
 
+@pytest.mark.parametrize("host, code, expected", [
+    ("", "", "open"), ("localhost", "", "open"), ("127.0.0.1", "", "open"), ("[::1]", "", "open"),
+    ("gst-reconciliation.streamlit.app", "", "blocked"), ("192.168.1.5", "", "blocked"),
+    ("gst-reconciliation.streamlit.app", "s3cret-code", "code"), ("localhost", "s3cret-code", "code"),
+])
+def test_first_admin_setup_rule(host, code, expected):
+    from ui.login import setup_requirement
+    assert setup_requirement(host, code) == expected
+
+
+def test_setup_code_required_when_configured(db_url, monkeypatch):
+    monkeypatch.setenv("GST_RECON_SETUP_CODE", "Right-Code-77")
+    at = new_app()
+    labels = [t.label for t in at.text_input]
+    assert labels[0] == "Setup code"
+    for i, value in enumerate(["wrong", "asha", "Asha", "Secret123", "Secret123"]):
+        at.text_input[i].set_value(value)
+    btn(at, "Create admin and sign in").click().run()
+    assert any("setup code is not correct" in e.value for e in at.error)
+    assert not AuthService(Database(db_url)).has_users()
+    at.text_input[0].set_value("Right-Code-77")
+    btn(at, "Create admin and sign in").click().run()
+    ok(at, "setup with code")
+    assert AuthService(Database(db_url)).has_users()
+
+
 def test_non_admin_has_no_admin_page(db_url):
     auth = AuthService(Database(db_url), iterations=1_000)
     auth.create_user(*ADMIN)

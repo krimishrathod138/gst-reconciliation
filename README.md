@@ -5,11 +5,11 @@
 ## Quick start (Windows)
 
 1. Install **Python 3.11+** from <https://www.python.org/downloads/> and tick *"Add python.exe to PATH"*.
-2. Download the project: **Code → Download ZIP** on GitHub (then unzip it), or run
+2. Download the project: **Code â†’ Download ZIP** on GitHub (then unzip it), or run
    `git clone https://github.com/krimishrathod138/gst-reconciliation.git`.
 3. Double-click **`start_app.bat`**. The first run sets up everything automatically, which takes a few
    minutes. The app then opens at <http://localhost:8510>.
-4. Create the administrator account on the first screen, then try **Reconcile → Load sample data →
+4. Create the administrator account on the first screen, then try **Reconcile â†’ Load sample data â†’
    Run reconciliation**.
 
 This tool reconciles your **Purchase Register** (Tally / ERP / Excel) with **GSTR-2B** or **GSTR-2A**, and
@@ -46,8 +46,31 @@ password. After that, everyone signs in with their own account, and admins add u
 computers cannot open the app. It is read from the folder the app starts in, which `start_app.bat`
 takes care of.
 
-To try the app, go to **Reconcile → Sample data: Excel register or Tally export → Load sample data →
+To try the app, go to **Reconcile â†’ Sample data: Excel register or Tally export â†’ Load sample data â†’
 Run reconciliation**.
+
+## Online hosting (Streamlit Community Cloud)
+
+GitHub Pages cannot run this app: it serves only static HTML, not Python. To get a public link:
+
+1. Sign in at <https://share.streamlit.io> with GitHub, then click **Create app**.
+2. Fill in the form:
+   * **Repository:** `krimishrathod138/gst-reconciliation`
+   * **Branch:** `main`
+   * **Main file:** `app.py`
+   * **Advanced settings â†’ Python version:** 3.12
+3. In **Advanced settings â†’ Secrets**, add:
+   ```toml
+   admin_setup_code = "choose-a-long-secret-code"
+   ```
+   Opened from anywhere other than your own computer, the app only lets someone create the first admin
+   if they enter this code. Without the secret, setup is refused, so a stranger who finds the link
+   cannot make themselves admin.
+4. Click **Deploy**. Open the link, enter the setup code and create your admin account.
+
+**Limitation:** Streamlit Cloud's disk is temporary. When the app restarts or sleeps after inactivity,
+the database is reset: users, saved runs and the vendor master are lost. The online copy is therefore
+for demonstration. For real client data, run it locally with `start_app.bat`.
 
 ## 3. Tests
 
@@ -55,13 +78,13 @@ Run reconciliation**.
 .venv\Scripts\python.exe -m pytest -v
 ```
 
-There are **224 tests**:
+There are **234 tests**:
 
 | File | Covers |
 |---|---|
 | `test_cleaner.py` | GSTIN checksum, invoice / date / amount normalisation, duplicates, 1-lakh-row speed |
 | `test_matcher.py` | every matching tier, tolerance rules, fuzzy matching, CN/DN netting, review decisions, summaries |
-| `test_loader_reports.py` | loaders (Excel, CSV, portal Excel, JSON), Excel report, Indian ₹ formats, database, migration, audit trail |
+| `test_loader_reports.py` | loaders (Excel, CSV, portal Excel, JSON), Excel report, Indian â‚¹ formats, database, migration, audit trail |
 | `test_periods.py` | FY / month range, carry-forward across runs, month-wise schedule |
 | `test_tally.py` | Tally register import, purchase and sales |
 | `test_gstr3b.py` | GSTR-3B parsing and the 3B vs 2B vs books comparison |
@@ -76,17 +99,17 @@ There are **224 tests**:
 
 ### Inputs
 * **Registers.** Excel or CSV. Title rows above the table are detected automatically.
-* **Tally exports.** A *Purchase Register / Sales Register → Export → Excel* file is recognised and
+* **Tally exports.** A *Purchase Register / Sales Register â†’ Export â†’ Excel* file is recognised and
   converted automatically:
   * **Invoice number.** The supplier invoice number is used; if it is missing, the voucher number.
   * **Tax.** Ledger columns containing IGST / CGST / SGST / Cess are summed.
-  * **Taxable value.** Gross Total − taxes − round off, so freight and packing ledgers are included.
+  * **Taxable value.** Gross Total âˆ’ taxes âˆ’ round off, so freight and packing ledgers are included.
   * **Voucher types.** In a purchase register, a Tally Debit Note (purchase return) is the supplier's
     credit note.
   * **Other rows.** `Dr` / `Cr` amounts, cancelled vouchers and the Grand Total row are handled.
 * **GSTR-2B / 2A / GSTR-1.** The official JSON, the portal Excel (B2B, B2B-CDNR and amendment
   sheets), or any flat file. Several months can be loaded at once. Sections with no invoice-level
-  counterpart in the books (ISD, IMPG, IMPGSEZ, ECO …) are listed as "not reconciled".
+  counterpart in the books (ISD, IMPG, IMPGSEZ, ECO â€¦) are listed as "not reconciled".
 * **Column mapping.** Columns are auto-suggested; you can adjust them and save them as profiles.
 
 ### Cleaning and matching
@@ -100,12 +123,12 @@ The six tiers, in order:
 
 Credit and debit notes are matched separately and netted.
 
-**Tolerance rules.** The default is **₹ only (±₹10)**. The alternatives are ₹ AND %, % only, and
-₹ OR % (lenient: 1% of ₹1 crore is ₹1 lakh). The rule used is shown on the Dashboard, in the Excel
+**Tolerance rules.** The default is **â‚¹ only (Â±â‚¹10)**. The alternatives are â‚¹ AND %, % only, and
+â‚¹ OR % (lenient: 1% of â‚¹1 crore is â‚¹1 lakh). The rule used is shown on the Dashboard, in the Excel
 Summary and in the PDFs.
 
 ### Financial year, months and carry forward
-* On **Reconcile → Period**, pick a **financial year** and a **month range**. Books are selected by
+* On **Reconcile â†’ Period**, pick a **financial year** and a **month range**. Books are selected by
   invoice month; portal documents by return period.
 * **Carry forward (on by default).** Books documents still *Missing in 2B* at the end of the previous
   saved run are brought into the next run, matched against the new 2B, and carried again until they
@@ -125,13 +148,13 @@ For each month, the page compares:
 * **2B ITC available**, by return period, excluding "ITC not available"
 * **3B Table 4A(5) "All other ITC"**, the part of 3B that 2B's B2B and CDNR sections feed
 
-It shows the differences per tax head and a cumulative 3B − 2B. Months where 3B exceeds 2B are
+It shows the differences per tax head and a cumulative 3B âˆ’ 2B. Months where 3B exceeds 2B are
 flagged **Excess claimed** (Sec. 16(2)(aa) / Rule 36(4)). The 3B figures are saved with the run and
 added as a sheet in the Excel report.
 
 ### Review and audit trail
 Accept or reject probable matches (bulk-accept by score) and add remarks to any document. Every
-change is recorded with the **user, the time, and the old → new value**. The trail is shown on the
+change is recorded with the **user, the time, and the old â†’ new value**. The trail is shown on the
 Review page and in the Excel sheet *Review Audit Trail*; the *Probable Matches* sheet shows
 *Reviewed By / At*.
 
@@ -147,7 +170,7 @@ Review page and in the Excel sheet *Review Audit Trail*; the *Probable Matches* 
   * **send to all** suppliers who have an e-mail address, after confirming
 
   Every sent or failed e-mail is logged.
-* **Mail server.** An admin configures it on **Admin → E-mail server** (host, port, STARTTLS / SSL,
+* **Mail server.** An admin configures it on **Admin â†’ E-mail server** (host, port, STARTTLS / SSL,
   from address) and can send a test e-mail. **The SMTP password is never stored.** Set the environment
   variable `GST_RECON_SMTP_PASSWORD` before starting the app, or type the password when sending (it is
   kept only for that session).
@@ -164,11 +187,11 @@ Review page and in the Excel sheet *Review Audit Trail*; the *Probable Matches* 
   * Month-wise Carry Forward
   * Review Audit Trail
 
-  Every sheet has frozen headers, filters and auto widths. The **Indian ₹ lakh/crore format** is
+  Every sheet has frozen headers, filters and auto widths. The **Indian â‚¹ lakh/crore format** is
   correct for every sign and size; this was checked by opening the file in Excel. Remarks are always
   stored as text, never as formulas.
 * **PDF.** The **Summary** (A4 portrait) and the **Supplier-wise** report (A4 landscape; optionally
-  pending suppliers only), with the ₹ symbol, a repeated table header and page numbers.
+  pending suppliers only), with the â‚¹ symbol, a repeated table header and page numbers.
 * **Filtered reports.** An optional filter (supplier, GSTIN, status, month, FY) limits what goes into
   both.
 
@@ -195,9 +218,9 @@ Review page and in the Excel sheet *Review Audit Trail*; the *Probable Matches* 
 | Step | Time* |
 |---|---|
 | Cleaning + matching | ~5 s |
-| Excel report (≈92,000 matched rows, 10+ sheets, 15 MB) | ~21 s (was 72 s before the writer was replaced) |
+| Excel report (â‰ˆ92,000 matched rows, 10+ sheets, 15 MB) | ~21 s (was 72 s before the writer was replaced) |
 
-\*Measured on the development laptop while its CPU was 40–70% busy with other programs; an idle
+\*Measured on the development laptop while its CPU was 40â€“70% busy with other programs; an idle
 machine is faster.
 
 The report's data rows are rendered column-wise with Arrow string operations and streamed into an
@@ -209,7 +232,7 @@ XlsxWriter workbook. XlsxWriter also writes the styles, widths, filters and high
 |---|---|
 | `purchase_register.xlsx` / `tally_purchase_register.xlsx` | 53 purchase documents: plain register / the same as a Tally export |
 | `gstr2b_apr2024.json`, `gstr2b_may2024.json`, `gstr2b_portal_format.xlsx` | GSTR-2B in official JSON (two months) and portal Excel |
-| `gstr3b_apr2024.json`, `gstr3b_may2024.json` | GSTR-3B: April over-claims by ₹5,000, May under-claims by ₹1,200 |
+| `gstr3b_apr2024.json`, `gstr3b_may2024.json` | GSTR-3B: April over-claims by â‚¹5,000, May under-claims by â‚¹1,200 |
 | `sales_register.xlsx` / `tally_sales_register.xlsx`, `gstr1_may2024.json` | sales vs GSTR-1 |
 | `templates/*.xlsx` | blank input templates |
 
@@ -224,9 +247,9 @@ With the default rule the purchase sample gives:
 | Missing in 2B | 8 |
 | Missing in books | 5 |
 
-ITC at risk is **₹39,360**. The Tally version gives identical results.
+ITC at risk is **â‚¹39,360**. The Tally version gives identical results.
 
-`REW/T600` differs by about 0.6% (₹1,500 / ₹270). It is a Mismatch under ₹ only and within tolerance
+`REW/T600` differs by about 0.6% (â‚¹1,500 / â‚¹270). It is a Mismatch under â‚¹ only and within tolerance
 under the % rules.
 
 ## 7. Project layout
