@@ -33,7 +33,10 @@ if not exist "%PY%" (
     "%PY%" -m pip install --upgrade pip
     "%PY%" -m pip install -r "%~dp0requirements.txt"
     if errorlevel 1 (
-        echo [ERROR] Installing the required packages failed - check your internet connection and try again.
+        echo [ERROR] Installing the required packages failed.
+        echo  - Check your internet connection and try again.
+        echo  - If the message above says "filename or extension is too long", move this folder to a
+        echo    short path such as C:\gst-reconciliation and run start_app.bat again.
         rmdir /s /q "%~dp0.venv"
         pause
         exit /b 1
