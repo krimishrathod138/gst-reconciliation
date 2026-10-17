@@ -12,13 +12,33 @@ set "PY=%~dp0.venv\Scripts\python.exe"
 set "URL=http://localhost:8510"
 set "HEALTH=http://127.0.0.1:8510/_stcore/health"
 
+rem First run (e.g. a fresh download from GitHub): create the environment and install packages.
 if not exist "%PY%" (
-    echo [ERROR] Virtual environment not found: "%PY%"
-    echo Create it first:
-    echo     python -m venv .venv
-    echo     .venv\Scripts\python.exe -m pip install -r requirements.txt
-    pause
-    exit /b 1
+    echo First run - setting up the Python environment. This takes a few minutes...
+    set "BASEPY="
+    where py >nul 2>&1 && set "BASEPY=py -3"
+    if not defined BASEPY where python >nul 2>&1 && set "BASEPY=python"
+    if not defined BASEPY (
+        echo [ERROR] Python 3.11 or newer is not installed.
+        echo Install it from https://www.python.org/downloads/  ^(tick "Add python.exe to PATH"^), then run this file again.
+        pause
+        exit /b 1
+    )
+    call %%BASEPY%% -m venv "%~dp0.venv"
+    if not exist "%PY%" (
+        echo [ERROR] Could not create the virtual environment.
+        pause
+        exit /b 1
+    )
+    "%PY%" -m pip install --upgrade pip
+    "%PY%" -m pip install -r "%~dp0requirements.txt"
+    if errorlevel 1 (
+        echo [ERROR] Installing the required packages failed - check your internet connection and try again.
+        rmdir /s /q "%~dp0.venv"
+        pause
+        exit /b 1
+    )
+    echo Setup complete.
 )
 
 rem Already running? Just open the browser.

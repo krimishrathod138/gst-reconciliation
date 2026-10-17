@@ -1,5 +1,17 @@
 # GST Reconciliation
 
+[![tests](https://github.com/krimishrathod138/gst-reconciliation/actions/workflows/tests.yml/badge.svg)](https://github.com/krimishrathod138/gst-reconciliation/actions/workflows/tests.yml)
+
+## Quick start (Windows)
+
+1. Install **Python 3.11+** from <https://www.python.org/downloads/> and tick *"Add python.exe to PATH"*.
+2. Download the project: **Code → Download ZIP** on GitHub (then unzip it), or run
+   `git clone https://github.com/krimishrathod138/gst-reconciliation.git`.
+3. Double-click **`start_app.bat`**. The first run sets up everything automatically, which takes a few
+   minutes. The app then opens at <http://localhost:8510>.
+4. Create the administrator account on the first screen, then try **Reconcile → Load sample data →
+   Run reconciliation**.
+
 This tool reconciles your **Purchase Register** (Tally / ERP / Excel) with **GSTR-2B** or **GSTR-2A**, and
 your **Sales Register** with **GSTR-1**. It compares ITC claimed in **GSTR-3B** with 2B and your books. It
 follows missing invoices month by month until they appear, and helps you chase suppliers by e-mail.
